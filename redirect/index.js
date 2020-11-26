@@ -1,11 +1,14 @@
 const { origin, pathname } = window.location;
-const exist = (path) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('HEAD', path, false);
-    xhr.send();
-    console.log(xhr)
-    
-    return xhr.status !== 404;
+const exist = async (path) => {
+    let status = 0;
+
+    await $.ajax({
+        url: path
+    }).catch((e) => {
+        status = e.status;
+    });
+
+    return status === 0;
 };
 
 $(document).ready(async () => {
@@ -16,7 +19,7 @@ $(document).ready(async () => {
         document.close();
     }
     if(pathname.split('/').length === 2) await four();
-    const path = exist('./index.html');
+    const path = await exist('./index.html');
     if(path) {
         const data = await (await fetch('./index.html')).text();
         const tags = data.split('<head>')[1].split('</head>')[0].trim().split('<').filter(e => e && !e.startsWith('/'));
