@@ -1,7 +1,7 @@
 const { origin, pathname } = window.location;
 const exist = (path) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('HEAD', path);
+    xhr.open('HEAD', path, false);
     xhr.send();
     
     return xhr.status !== "404";
