@@ -1,3 +1,7 @@
 const id = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
 
-console.log(id);
+(async () => {
+    const item = await (await fetch(`https://api.blobry.com/data/items/${id}`)).json();
+
+    console.log(item);
+})();
