@@ -7,10 +7,10 @@ const exist = (path) => {
     return xhr.status !== "404";
 };
 
-(async () => {
+$(document).ready(() => {
     const path = exist('./index.html');
     console.log(pathname);
     if(path) console.log('POGGERS this directory exists!!!!!!!!!!!!!!!!!!!!!!!!!!');
     else  window.location.href = 'https://data.blobry.com/redirect/404.html';
     
-})();
+});
