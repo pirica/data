@@ -34,6 +34,8 @@ $(document).ready(async () => {
                 element[tagI.type] = tagI.value;
             }
 
+            element.onload = console.log;
+
             document.getElementsByTagName('head')[0].appendChild(element);
             // element.outerHTML = tag;
         }
