@@ -1,23 +1,16 @@
 const { origin, pathname } = window.location;
-const exist = async (path) => {
-    let response = true;
-    try {
-        await fetch(path);
-        response = true;
-    } catch(e) {
-        response = false;
-    }
+const exist = (path) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('HEAD', path);
+    xhr.send();
     
-    return response;
+    return xhr.status !== 404;
 };
 
 (async () => {
-    // const path = await exist('../index.html');
+    const path = exist('./index.html');
     console.log(pathname);
-    try {
-        (await fetch('./index.html')).status !== 404;
-    } catch(err) {
-        window.location.href = 'https://data.blobry.com/redirect/404.html';
-    }
-    console.log('POGGERS this directory exists!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    if(path) console.log('POGGERS this directory exists!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    else  window.location.href = 'https://data.blobry.com/redirect/404.html';
+    
 })();
