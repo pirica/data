@@ -19,10 +19,18 @@ $(document).ready(async () => {
     const path = exist('./index.html');
     if(path) {
         const data = await (await fetch('./index.html')).text();
+        const tags = data.split('<head>')[1].split('</head>')[0].trim().split('<').filter(e => e && !e.startsWith('/'));
+        let length = tags.length;
+
+        while(length--) {
+            const tag = tags[length];
+            console.log(tag);
+        }
         console.log('%c[DATA]', 'color: #7289DA', `You're going to the correct destination!`);
-        document.open('text/html');
-        document.write(data);
-        document.close();
+        // dat
+        // document.open('text/html');
+        // document.write(data);
+        // document.close();
     }
     else await four();
 });
