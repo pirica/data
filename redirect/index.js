@@ -3,6 +3,7 @@ const exist = (path) => {
     const xhr = new XMLHttpRequest();
     xhr.open('HEAD', path, false);
     xhr.send();
+    console.log(xhr)
     
     return xhr.status !== "404";
 };
