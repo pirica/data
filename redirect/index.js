@@ -24,10 +24,11 @@ $(document).ready(async () => {
 
         while(length--) {
             const tag = `<${tags[length]}</${tags[length].split(' ')[0]}>`;
-            const element = document.createElement(tags[length].split(' ')[0].toLowerCase());
+            // const element = document.createElement(tags[length].split(' ')[0].toLowerCase());
+            document.head.innerHTML += tag;
 
-            document.getElementsByTagName('head')[0].appendChild(element);
-            element.outerHTML = tag;
+            // document.getElementsByTagName('head')[0].appendChild(element);
+            // element.outerHTML = tag;
         }
         console.log('%c[DATA]', 'color: #7289DA', `You're going to the correct destination!`);
         // dat
