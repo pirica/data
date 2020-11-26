@@ -12,9 +12,12 @@ const exist = async (path) => {
 };
 
 (async () => {
-    const path = await exist('../index.html');
-    if(path) console.log('POGGERS this directory exists!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    else {
+    // const path = await exist('../index.html');
+    console.log(pathname);
+    try {
+        (await fetch('/index.html')).status !== 404;
+    } catch(err) {
         window.location.href = 'https://data.blobry.com/redirect/404.html';
-    };
+    }
+    console.log('POGGERS this directory exists!!!!!!!!!!!!!!!!!!!!!!!!!!');
 })();
