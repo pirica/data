@@ -9,9 +9,8 @@ const exist = (path) => {
 };
 
 $(document).ready(() => {
+    if(pathname.split('/').length === 2) window.location.href = 'https://data.blobry.com/redirect/404.html';
     const path = exist('./index.html');
-    console.log(pathname);
     if(path) console.log('POGGERS this directory exists!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    else  window.location.href = 'https://data.blobry.com/redirect/404.html';
-    
+    else window.location.href = 'https://data.blobry.com/redirect/404.html'; 
 });
