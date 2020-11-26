@@ -24,10 +24,17 @@ $(document).ready(async () => {
 
         while(length--) {
             const tag = `<${tags[length]}</${tags[length].split(' ')[0]}>`;
-            // const element = document.createElement(tags[length].split(' ')[0].toLowerCase());
-            document.head.innerHTML += tag;
+            const other = tag.split(`<${tags[length].split(' ')[0]} `)[1].split(`</${tags[length].split(' ')[0]}>`)[0].split('>')[0].split(' ').map(e => {return {type: e.split('"')[0].split('=')[0], value: e.split('"')[1]}});
+            const element = document.createElement(tags[length].split(' ')[0].toLowerCase());
+            // document.head.innerHTML += tag;
 
-            // document.getElementsByTagName('head')[0].appendChild(element);
+            for (let i = 0; i < other.length; i++) {
+                const tagI = other[i];
+                console.log(tagI)
+                element[tagI.type] = tagI.value;
+            }
+
+            document.getElementsByTagName('head')[0].appendChild(element);
             // element.outerHTML = tag;
         }
         console.log('%c[DATA]', 'color: #7289DA', `You're going to the correct destination!`);
