@@ -50,30 +50,3 @@ html {
         transform: scale(1) translate(0px, 1px);
     }
 }
-
-.colorchange {
-    margin: 50px;
-    top: -40px;
-    position: fixed;
-    right: -36px;
-    text-align: right;
-    z-index: 1;
-}
-
-.colorchange > div {
-    transition: 0.2s;
-    padding: 10px;
-    display: inline-block;
-    color: #7289DA;
-    background: white;
-    position: relative;
-    user-select: none;
-    border-radius: 5px;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px #7289DA;
-}
-
-.colorchange > div:hover {
-    background: #7289DA;
-    color: #ffffff;
-}
