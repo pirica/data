@@ -9,14 +9,20 @@ const exist = (path) => {
 };
 
 $(document).ready(async () => {
-    if(pathname.split('/').length === 2) window.location.href = 'https://data.blobry.com/redirect/404.html';
+    const four = async () => {
+        const page = await (await fetch('https://data.blobry.com/redirect/404.html')).text();
+        document.open('text/html');
+        document.write(page);
+        document.close();
+    }
+    if(pathname.split('/').length === 2) await four();
     const path = exist('./index.html');
     if(path) {
-        console.log('Loading Data');
         const data = await (await fetch('./index.html')).text();
+        console.log('%c[DATA]', 'color: #7289DA', `You're going to the correct destination!`);
         document.open('text/html');
         document.write(data);
         document.close();
     }
-    else window.location.href = 'https://data.blobry.com/redirect/404.html'; 
+    else await four();
 });
