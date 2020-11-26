@@ -5,7 +5,7 @@ const exist = (path) => {
     xhr.send();
     console.log(xhr)
     
-    return xhr.status !== "404";
+    return xhr.status !== 404;
 };
 
 $(document).ready(() => {
