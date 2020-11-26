@@ -9,10 +9,10 @@ const exist = async (path) => {
 };
 
 (async () => {
-    console.log(pathname.split('/'))
-    console.log(pathname.split('/').length)
-    if(pathname.split('/').length < 2) return;
+    if(pathname.split('/').length === 2) return;
     const path = await exist('../index.html');
     if(path) console.log('POGGERS this directory exists!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    else console.log('NO POOGGERS NOOOOOO')
+    else {
+        window.location.href = 'https://data.blobry.com/redirect/404.html';
+    };
 })();
