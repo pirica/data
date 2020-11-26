@@ -9,5 +9,7 @@ const exist = async (path) => {
 };
 
 (async () => {
-    console.log(await exist(pathname));
+    const path = await exist('../index.html');
+    if(path) console.log('POGGERS this directory exists!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    else console.log('NO POOGGERS NOOOOOO')
 })();
