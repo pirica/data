@@ -1,15 +1,17 @@
 const { origin, pathname } = window.location;
 const exist = async (path) => {
+    let response = true;
     try {
         await fetch(path);
-        return true;
+        response = true;
     } catch(e) {
-        return false;
+        response = false;
     }
+    
+    return response;
 };
 
 (async () => {
-    // if(pathname.split('/').length === 2) return;
     const path = await exist('../index.html');
     if(path) console.log('POGGERS this directory exists!!!!!!!!!!!!!!!!!!!!!!!!!!');
     else {
