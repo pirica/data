@@ -4,7 +4,7 @@ const exist = (path) => {
     xhr.open('HEAD', path);
     xhr.send();
     
-    return xhr.status !== 404;
+    return xhr.status !== "404";
 };
 
 (async () => {
