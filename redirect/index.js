@@ -26,28 +26,17 @@ $(document).ready(async () => {
             const tag = `<${tags[length]}</${tags[length].split(' ')[0]}>`;
             const other = tag.split(`<${tags[length].split(' ')[0]} `)[1].split(`</${tags[length].split(' ')[0]}>`)[0].split('>')[0].split(' ').map(e => {return {type: e.split('"')[0].split('=')[0], value: e.split('"')[1]}});
             const element = document.createElement(tags[length].split(' ')[0].toLowerCase());
-            // document.head.innerHTML += tag;
 
             for (let i = 0; i < other.length; i++) {
                 const tagI = other[i];
-                console.log(tagI)
                 element[tagI.type] = tagI.value;
             }
 
-            if(tags[length].split(' ')[0].toLowerCase() === 'script') {
-                eval(await (await fetch(other.find(e => e.type === 'src').value)).text());
-            }
-
-            element.onload = console.log;
+            if(tags[length].split(' ')[0].toLowerCase() === 'script') eval(await (await fetch(other.find(e => e.type === 'src').value)).text());
 
             document.getElementsByTagName('head')[0].appendChild(element);
-            // element.outerHTML = tag;
         }
         console.log('%c[DATA]', 'color: #7289DA', `You're going to the correct destination!`);
-        // dat
-        // document.open('text/html');
-        // document.write(data);
-        // document.close();
     }
     else await four();
 });
