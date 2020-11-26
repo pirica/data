@@ -6,6 +6,8 @@ const id = window.location.pathname.substring(window.location.pathname.lastIndex
 
         $('#blob').remove();
         $('.center')[0].innerHTML += item.widget.usage.small;
+        $('.center')[0].innerHTML += item.widget.usage.section;
+        $('.center')[0].innerHTML += item.widget.usage.shop;
         console.log(item);
     } catch(err) {
         $('path').css('fill', '#6175B7');
