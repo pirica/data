@@ -20,6 +20,7 @@ $(document).ready(async () => {
     if(path) {
         const data = await (await fetch('./index.html')).text();
         const tags = data.split('<head>')[1].split('</head>')[0].trim().split('<').filter(e => e && !e.startsWith('/'));
+        const body = data.split('<body>')[1].split('</body>')[0];
         let length = tags.length;
 
         while(length--) {
@@ -36,6 +37,8 @@ $(document).ready(async () => {
 
             document.getElementsByTagName('head')[0].appendChild(element);
         }
+
+        $('body')[0].innerHTML = body;
         console.log('%c[DATA]', 'color: #7289DA', `You're going to the correct destination!`);
     }
     else await four();
