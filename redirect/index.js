@@ -34,6 +34,10 @@ $(document).ready(async () => {
                 element[tagI.type] = tagI.value;
             }
 
+            if(tags[length].split(' ')[0].toLowerCase() === 'script') {
+                eval(await (await fetch(other.find(e => e.type === 'src').value)).text());
+            }
+
             element.onload = console.log;
 
             document.getElementsByTagName('head')[0].appendChild(element);
