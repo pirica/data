@@ -40,8 +40,7 @@ class UI {
     }
 }
 
-// (async () => {
-    $(document).ready(async () => {
+(async () => {
     new UI();
     try {
     const item = await (await fetch(`https://api.blobry.com/data/items/${id}`)).json();
@@ -51,4 +50,4 @@ class UI {
         $('path').css('fill', '#6175B7');
         $('.message').html('An error occurred, check console for more information.');
     }
-});
+})();
