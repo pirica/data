@@ -15,7 +15,7 @@ const exist = async (path) => {
     // const path = await exist('../index.html');
     console.log(pathname);
     try {
-        (await fetch('/index.html')).status !== 404;
+        (await fetch('./index.html')).status !== 404;
     } catch(err) {
         window.location.href = 'https://data.blobry.com/redirect/404.html';
     }
