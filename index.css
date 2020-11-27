@@ -36,3 +36,12 @@ html {
 .center:hover > div:nth-of-type(1) {
     filter: invert(1950%) sepia(1713%) saturate(107%) hue-rotate(130deg) brightness(95%) contrast(55%);
 }
+
+@keyframes loading {
+    0% {
+        background-position: -50vw 0;
+    }
+    100% {
+        background-position: 50vw 0;
+    }
+}
