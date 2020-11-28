@@ -231,6 +231,28 @@ class Shop {
 }
 
 $(document).ready(async () => {
-    shop = new Shop(await (await fetch(`https://${true ? 'api.blobry.com' : '127.0.0.1:8787'}/data`)).json());
-    shop.setShop();
+    const disable = Cookies.get('acceptance');
+    const start = async () => {
+        shop = new Shop(await (await fetch(`https://${true ? 'api.blobry.com' : '127.0.0.1:8787'}/data`)).json());
+        shop.setShop();
+    };
+    if(!disable) {
+        $('.rows').animate({
+            opacity: 0
+        }, 1500);
+        setTimeout(() => {
+            document.body.innerHTML += '<div class="acceptance"><div><div>Acceptance</div><div>Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic. Blobry is a non-official Website and is not affiliated with Epic Games in any way.</div><div>You agree by pressing the button below, saying you understand and will every time visiting this website.</div></div><div class="button"><div>accept</div></div></div>';
+            $('.acceptance').children()[1].onclick = async () => {
+                $('.acceptance').fadeOut(500);
+                setTimeout(async () => {
+                    Cookies.set('acceptance', true);
+                    await start();
+                    $('.rows').animate({
+                        opacity: 0
+                    }, 1500);
+                }, 500);
+            };
+        }, 1500);
+    }
+    else await start();
 });
