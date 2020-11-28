@@ -81,15 +81,19 @@ html {
 }
 
 .message {
-    color: #6175B7;
+    bottom: 11px;
+    color: rgb(42 45 47);
     position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 92%;
-    background: #7289DA;
-    white-space: nowrap;
     padding: 8px;
-    border-radius: 1000px;
+    transform: translate(-50%);
+    left: 50%;
+    font-size: 2vh;
+    background: linear-gradient(to right, #7289E7 8%, #6175B7);
+    animation-duration: 48.2s;
+    animation-iteration-count: infinite;
+    animation-name: loading;
+    text-align: center;
+    font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
 .other {
