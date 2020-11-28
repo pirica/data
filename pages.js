@@ -32,8 +32,8 @@ class Page {
             width: '1600vh'
         }, 1000);
 
-        // setTimeout(() => {
-        //     window.location.href = this.configuration.url;
-        // }, 2000);
+        setTimeout(() => {
+            window.location.href = this.configuration.url;
+        }, 2000);
     }
 }
