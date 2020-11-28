@@ -31,8 +31,9 @@ class Shop {
         let { size, price: { finalPrice: price }, name, type } = item;
         // TODO: regularPrice (price Object)
         size = size === "Normal" ? null : size === 'DoubleWide' ? '500px' : null;
+        const render = item.assets && item.assets[0].renderData.Spotlight_Position_Y;
         const variants = item.assets ? item.assets.length > 1 : false;
-        return `<div class="item" style="background: radial-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${size};"><div><div></div><img src="${asset}" draggable="false"></div><div><div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div></div></div>${item.assets && item.assets[0].renderData.Spotlight_Position_Y ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%)"></div>` : ''}</div>`;
+        return `<div class="item" style="background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${size};"><img src="${asset}" draggable="false"><div><div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div></div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${item.banner ? `<div><div>${item.banner.name}</div></div>` : ''}</div>`;
     }
 
     addAllPanels() {
@@ -231,6 +232,6 @@ class Shop {
 }
 
 $(document).ready(async () => {
-    shop = new Shop(await (await fetch(`https://${true ? 'api.blobry.com' : '127.0.0.1:8787'}/data`)).json());
+    shop = new Shop(await (await fetch(`https://api.blobry.com/data`)).json());
     shop.setShop();
 });
