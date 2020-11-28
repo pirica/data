@@ -231,6 +231,6 @@ class Shop {
 }
 
 $(document).ready(async () => {
-    shop = new Shop(await (await fetch(`http://${true ? 'api.blobry.com' : '127.0.0.1:8787'}/data`)).json());
+    shop = new Shop(await (await fetch(`https://${true ? 'api.blobry.com' : '127.0.0.1:8787'}/data`)).json());
     shop.setShop();
 });
