@@ -22,7 +22,7 @@ $(document).ready(async () => {
     }
     if(pathname.split('/').length === 2) await four();
     const path = await exist('./index.html');
-    if(path && !blacklist.includes(pathname)) {
+    if(path && !blacklist.find(e => pathname.startsWith(pathname))) {
         const data = await (await fetch('./index.html')).text();
         const tags = data.split('<head>')[1].split('</head>')[0].trim().split('<').filter(e => e && !e.startsWith('/'));
         $('body')[0].innerHTML = data.split('<body>')[1].split('</body>')[0];
