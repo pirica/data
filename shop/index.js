@@ -126,7 +126,7 @@ class Shop {
             Panel.id = `${panel}-${type}`;
 
             document.getElementsByClassName('rows')[0].appendChild(Panel);
-            Panel.innerHTML = `<div></div><div><div id="main-message">loading</div></div>`;
+            Panel.innerHTML = `<div></div><div><div id="main-message">loading<div></div></div></div>`;
 
             if(selected) {
                 if($('.main')[0]) $('.main').remove();
@@ -135,6 +135,14 @@ class Shop {
                     left: '36px',
                     opacity: 1
                 }, 50);
+                const timer = setInterval(() => {
+                    if($('.main')[0].id !== `${panel}-${type}`) {
+                        clearInterval(timer);
+                        return;
+                    }
+
+                    $('.main').children()[1].children[0].children[0].innerHTML = this.rotation;
+                }, 1000);
             }
         }
         let length = section.length;
@@ -151,7 +159,7 @@ class Shop {
             }
         }
 
-        Panel.children[1].children[0].innerHTML = section[0].section.name;
+        Panel.children[1].children[0].innerHTML = `${section[0].section.name}<div></div>`;
         $('.rows').children().css('position', 'absolute').css('top', '100%');
     }
 
@@ -241,9 +249,18 @@ class Shop {
     setDaily() {
         return this.setShop('daily');
     }
+
+    get rotation() {
+        const minutesRaw = String(59 - new Date().getMinutes());
+        const hours = 23 - new Date().getUTCHours();
+        const seconds = 60 - new Date().getSeconds() === 60 ? 0 : 60 - new Date().getSeconds();
+        const minutes = minutesRaw.length === 1 ? `0${minutesRaw}` : minutesRaw;
+
+        return `${hours !== 0 ? `${hours}:` : ''}${minutes}:${String(seconds).length === 1 ? `0${seconds}` : seconds}`;
+    }
 }
 
 $(document).ready(async () => {
-    shop = new Shop(await (await fetch(`https://api.blobry.com/data`)).json());
+    shop = new Shop(await (await fetch(`http://127.0.0.1:8787/data`)).json());
     shop.setShop();
 });
