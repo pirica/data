@@ -1,5 +1,15 @@
 let shop = null;
 
+class Banner {
+    constructor(banner) {
+        const hidden = ['reactive', 'variants', 'styles', 'traversal'];
+        this.id = banner.id;
+        this.name = banner.name;
+        this.valid = hidden.find(b => this.name.toLowerCase().includes(b)) || ['collect the set'].find(e => this.name.toLowerCase().includes(e.toLowerCase())) ? false : true;
+        this.special = this.valid ? false : true;
+    }
+}
+
 class Shop {
     constructor(data) {
         this.data = data;
@@ -28,12 +38,15 @@ class Shop {
             };
             asset = '';
         }
-        let { size, price: { finalPrice: price }, name, type } = item;
-        // TODO: regularPrice (price Object)
+        let { size, price: { finalPrice: price, regularPrice }, name, type } = item;
+
         size = size === "Normal" ? null : size === 'DoubleWide' ? '500px' : null;
         const render = item.assets && item.assets[0].renderData.Spotlight_Position_Y;
-        const variants = item.assets ? item.assets.length > 1 : false;
-        return `<div class="item" style="background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${size};"><img src="${asset}" draggable="false"><div><div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div></div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${item.banner ? `<div><div>${item.banner.name}</div></div>` : ''}</div>`;
+
+        const banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
+        const special = !banner && item.banner ? true : item.assets ? item.assets.length > 1 : false;
+
+        return `<div class="item" style="background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${size};"><img src="${asset}" draggable="false"><div>${special ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div>${banner.name}</div></div>` : ''}</div>`;
     }
 
     addAllPanels() {
@@ -84,18 +97,15 @@ class Shop {
             const div = document.createElement('div');
             div.id = item.id;
             Panel.children[0].appendChild(div);
-            console.log(div);
             if(item.size === "Normal") div.outerHTML = this.createItem(item);
             else {
                 const infront = data[length - 1];
-                if(!infront || infront.size !== 'Small' || !data[length + 2]) div.outerHTML = this.createItem(item);
+                if(!infront || infront.size !== 'Small') div.outerHTML = this.createItem(item);
                 else {
                     div.outerHTML = `<div class="other">${this.createItem(item)}${this.createItem(infront)}</div>`;
-                    console.log(div);
                     length--;
                 }
             }
-            div.onclick = console.log;
         }
 
         this.data[type].reverse();
@@ -104,7 +114,6 @@ class Shop {
     }
 
     setEvents() {
-        let index = 0;
         let switching = false;
         const functions = {
             values: {
@@ -204,7 +213,7 @@ class Shop {
         document.onwheel = (e) => {
             const direction = e.deltaY < 0 ? 'up' : e.deltaY > 0 ? 'down' : null;
 
-            if(allow) {
+            if(allow && direction) {
                 functions[direction](e);
                 allow = false;
                 setTimeout(() => {

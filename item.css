@@ -163,6 +163,24 @@
     left: -256px;
 }
 
+.item > div:nth-of-type(1) > img:nth-of-type(1) {
+    position: absolute;
+    width: 30px;
+    right: 0px;
+    top: -31px;
+    transition: 0.2s;
+}
+
+.item:hover > div:nth-of-type(1) > img:nth-of-type(1) {
+    top: -48px;
+}
+
+.item > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) {
+    opacity: 0.5;
+    text-decoration: line-through;
+    left: -10px;
+}
+
 @font-face {
     font-family: BurBank;
     src: url(./src/font/index.ttf);
