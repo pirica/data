@@ -6,17 +6,39 @@ class Banner {
         this.id = banner.id;
         this.name = banner.name;
         this.valid = hidden.find(b => this.name.toLowerCase().includes(b)) || ['collect the set'].find(e => this.name.toLowerCase().includes(e.toLowerCase())) ? false : true;
-        this.special = this.valid ? false : true;
+        this.special = this.valid && !['collect the set'].find(e => this.name.toLowerCase().includes(e.toLowerCase())) ? false : true;
     }
 }
 
-class Shop {
-    constructor(data) {
-        this.data = data;
-        this.main = $('.main');
+class Sections {
+    constructor(sections) {
+        this.raw = sections;
+        this.sections = sections;
+        this.set();
     }
 
-    createItem(item) {
+    set() {
+        const keys = Object.keys(this.sections);
+        let length = keys.length;
+
+        while(length--) {
+            const key = keys[length];
+            const section = this.sections[key].sort((a, b) => parseFloat(b.priority) - parseFloat(a.priority)).reverse();
+            let lengther = section.length;
+
+            while (lengther--) {
+                const item = section[lengther];
+
+                item.element = this.createItem(item, true);
+            }
+
+            this[key] = section;
+        }
+
+        return this;
+    }
+
+    createItem(item, element) {
         const rarity = item.rarity;
         let colors = {};
         const assets = [];
@@ -45,8 +67,26 @@ class Shop {
 
         const banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
         const special = !banner && item.banner ? true : item.assets ? item.assets.length > 1 : false;
+        const inner = `<img src="${asset}" draggable="false"><div>${special ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div>${banner.name}</div></div>` : ''}`;
 
-        return `<div class="item" style="background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${size};"><img src="${asset}" draggable="false"><div>${special ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div>${banner.name}</div></div>` : ''}</div>`;
+        if(element) {
+            const div = document.createElement('div');
+            div.classList.add('item');
+
+            div.style.cssText = `background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${size};`;
+            div.innerHTML = inner;
+
+            return div;
+        }
+
+        return `<div class="item" style="background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${size};">${inner}</div>`;
+    }
+}
+
+class Shop {
+    constructor(data) {
+        this.main = $('.main');
+        this.sections = new Sections(data);
     }
 
     addAllPanels() {
@@ -55,7 +95,7 @@ class Shop {
         }, 1500);
         setTimeout(() => {
             $('.rows').empty();
-            const keys = Object.keys(this.data);
+            const keys = Object.keys(this.sections.raw);
             let length = keys.length;
     
             while(length--) {
@@ -72,6 +112,7 @@ class Shop {
     }
 
     setPanel(type, panel, selected=false) {
+        const section = panel ? this.sections[type].filter(e => e.categories[0] === panel) : this.sections[type];
         let Panel = null;
         if(!$(`#${panel}-${type}`)[0]) {
             Panel = document.createElement('div');
@@ -89,27 +130,21 @@ class Shop {
                 }, 50);
             }
         }
-        const data = (panel ? this.data[type].filter(e => e.categories[0] === panel) : this.data[type]).sort((a, b) => parseFloat(b.priority) - parseFloat(a.priority)).reverse();
-        let length = data.length;
+        let length = section.length;
 
         while(length--) {
-            const item = data[length];
-            const div = document.createElement('div');
-            div.id = item.id;
-            Panel.children[0].appendChild(div);
-            if(item.size === "Normal") div.outerHTML = this.createItem(item);
-            else {
-                const infront = data[length - 1];
-                if(!infront || infront.size !== 'Small') div.outerHTML = this.createItem(item);
-                else {
-                    div.outerHTML = `<div class="other">${this.createItem(item)}${this.createItem(infront)}</div>`;
+            const item = section[length];
+            Panel.children[0].appendChild(item.element);
+            if(item.size === 'Small') {
+                const infront = section[length - 1];
+                if(infront && infront.size === 'Small') {
+                    item.element.outerHTML = `<div class="other">${this.sections.createItem(item)}${this.sections.createItem(infront)}</div>`;
                     length--;
                 }
             }
         }
 
-        this.data[type].reverse();
-        Panel.children[1].children[0].innerHTML = data[0].section.name;
+        Panel.children[1].children[0].innerHTML = section[0].section.name;
         $('.rows').children().css('position', 'absolute').css('top', '100%');
     }
 
@@ -129,7 +164,6 @@ class Shop {
                 switching = true;
 
                 console.log('%c[Shop]', 'color: #7289DA', `Switching to next section, at direction up (${next[0].id})`);
-                index++;
                 up = up + 5;
                 $('.main').css('position', 'absolute').animate({
                     top: `100%`,
@@ -161,7 +195,6 @@ class Shop {
                 if(!next[0]) return console.log('%c[Shop]', 'color: red', `Cannot switch to next section that doesn't exist, at direction down`);
                 switching = true;
                 console.log('%c[Shop]', 'color: #7289DA', `Switching to next section, at direction down (${next[0].id})`);
-                index++;
                 down = down + 200;
                 $('.main').css('position', 'absolute').animate({
                     top: `-100%`,
