@@ -169,3 +169,7 @@ html {
     left: 50%;
     transform: translate(-50%) skew(-13deg, -1deg);
 }
+
+.other > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) {
+    top: 209px;
+}
