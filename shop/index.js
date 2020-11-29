@@ -261,6 +261,11 @@ class Shop {
 }
 
 $(document).ready(async () => {
-    shop = new Shop(await (await fetch(`http://127.0.0.1:8787/data`)).json());
+    shop = new Shop(await (await fetch(`https://api.blobry.com/data`)).json());
     shop.setShop();
+
+    setInterval(async () => {
+        shop = new Shop(await (await fetch(`https://api.blobry.com/data`)).json());
+        shop.setShop();
+    }, 15000);
 });
