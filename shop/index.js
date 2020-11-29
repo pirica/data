@@ -65,9 +65,16 @@ class Sections {
         size = size === "Normal" ? null : size === 'DoubleWide' ? '500px' : null;
         const render = item.assets && item.assets[0].renderData.Spotlight_Position_Y;
 
-        const banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
+        let banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
         const special = !banner && item.banner ? true : item.assets ? item.assets.length > 1 : false;
-        const inner = `<img src="${asset}" draggable="false"><div>${special ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div>${banner.name}</div></div>` : ''}`;
+        const off = regularPrice - price;
+        if(off !== 0) {
+            banner = {
+                name: `${Intl.NumberFormat().format(off)} V-BUCKS OFF`,
+                color: 'purple'
+            };
+        }
+        const inner = `<img src="${asset}" draggable="false"><div>${special ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div${banner.color ? ' style="border: 3px solid #FF276D;background: #E4116E;color: white;"' : ''}>${banner.name}</div></div>` : ''}`;
 
         if(element) {
             const div = document.createElement('div');
@@ -148,94 +155,57 @@ class Shop {
         $('.rows').children().css('position', 'absolute').css('top', '100%');
     }
 
+    switch(e, direction, switching) {
+        const next = direction === 'up' ? $('.main').prev() : $('.main').next();
+        const element = document.getElementsByClassName('main')[0];
+        if(document.getElementsByClassName('main')[1]) document.getElementsByClassName('main')[1].remove();
+        if(!next[0]) return;
+        switching = true;
+
+        console.log('%c[Shop]', 'color: #7289DA', `Switching to next section, at direction ${direction} (${next[0].id})`);
+        $('.main').css('position', 'absolute').animate({
+            top: `${direction === 'down' ? '-' : ''}100%`,
+            opacity: 0.5
+        }, 250);
+        next.css('position', 'absolute').animate({
+            top: '0px',
+            opacity: 1
+        }, 250);
+        next.children().eq(1).css('left', '').css('opacity', '0');
+        setTimeout(() => {
+            next[0].style.cssText = '';
+            next[0].classList.add('main');
+            switching = false;
+            next.children().eq(1).animate({
+                left: '36px',
+                opacity: 1
+            }, 50);
+        }, 250);
+        element.classList.remove('main');
+        if(e) e.preventDefault();
+    }
+
     setEvents() {
         let switching = false;
-        const functions = {
-            values: {
-                up: 730,
-                down: 100
-            },
-            up: (e) => {
-                if(switching) return;
-                const next = $('.main').prev();
-                const element = document.getElementsByClassName('main')[0];
-                if(document.getElementsByClassName('main')[1]) document.getElementsByClassName('main')[1].remove();
-                if(!next[0]) return console.log('%c[Shop]', 'color: red', `Cannot switch to next section that doesn't exist, at direction up`);
-                switching = true;
-
-                console.log('%c[Shop]', 'color: #7289DA', `Switching to next section, at direction up (${next[0].id})`);
-                up = up + 5;
-                $('.main').css('position', 'absolute').animate({
-                    top: `100%`,
-                    opacity: 0.5
-                }, 250);
-                next.css('position', 'absolute').animate({
-                    top: '0px',
-                    opacity: 1
-                }, 250);
-                next.children().eq(1).css('left', '').css('opacity', '0');
-                setTimeout(() => {
-                    next[0].style.cssText = '';
-                    next[0].classList.add('main');
-                    switching = false;
-                    next.children().eq(1).animate({
-                        left: '36px',
-                        opacity: 1
-                    }, 50);
-                }, 250);
-                element.classList.remove('main');
-                e.preventDefault();
-                return true;
-            },
-            down: (e) => {
-                if(switching) return;
-                const next = $('.main').next();
-                const element = document.getElementsByClassName('main')[0];
-                if(document.getElementsByClassName('main')[1]) document.getElementsByClassName('main')[1].remove();
-                if(!next[0]) return console.log('%c[Shop]', 'color: red', `Cannot switch to next section that doesn't exist, at direction down`);
-                switching = true;
-                console.log('%c[Shop]', 'color: #7289DA', `Switching to next section, at direction down (${next[0].id})`);
-                down = down + 200;
-                $('.main').css('position', 'absolute').animate({
-                    top: `-100%`,
-                    opacity: 0.5
-                }, 250);
-                element.classList.remove('main');
-                next.animate({
-                    top: '0px',
-                    opacity: 1
-                }, 250);
-                next.children().eq(1).css('left', '').css('opacity', '0');
-                setTimeout(() => {
-                    next[0].style.cssText = '';
-                    next[0].classList.add('main');
-                    next.children().eq(1).animate({
-                        left: '36px',
-                        opacity: 1
-                    }, 50);
-                    switching = false;
-                }, 250);
-                e.preventDefault();
-            }
-        }
-        let { values: { down, up } } = functions;
+        const move = this.switch;
         document.onkeydown = function(e) {
+            if(switching) return;
             const { key } = e;
             switch(key) {
                 case 'ArrowUp': {
-                    functions.up(e);
+                    move(e, 'up', switching);
                 } break;
         
                 case 'ArrowDown': {
-                    functions.down(e);
+                    move(e, 'down', switching);
                 } break;
 
                 case 'PageUp': {
-                    functions.up(e);
+                    move(e, 'up', switching);
                 } break;
 
                 case 'PageDown': {
-                    functions.down(e);
+                    move(e, 'down', switching);
                 } break;
             }
         };
@@ -247,7 +217,7 @@ class Shop {
             const direction = e.deltaY < 0 ? 'up' : e.deltaY > 0 ? 'down' : null;
 
             if(allow && direction) {
-                functions[direction](e);
+                move(e, direction, switching);
                 allow = false;
                 setTimeout(() => {
                     allow = true;
