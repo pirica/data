@@ -267,5 +267,5 @@ $(document).ready(async () => {
     setInterval(async () => {
         shop = new Shop(await (await fetch(`https://api.blobry.com/data`)).json());
         shop.setShop();
-    }, 15000);
+    }, 900000);
 });
