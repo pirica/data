@@ -159,7 +159,7 @@ class Shop {
             }
         }
 
-        Panel.children[1].children[0].innerHTML = `${section[0].section.name}<div></div>`;
+        Panel.children[1].children[0].innerHTML = section[0].section.name;
         $('.rows').children().css('position', 'absolute').css('top', '100%');
     }
 
