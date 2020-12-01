@@ -127,11 +127,6 @@ class Shop {
             while(length--) {
                 const key = keys[length];
                 this.setPanel(key, length === keys.length - 1 ? true : false);
-                if(length === keys.length - 1 ? true : false) {
-                    setTimeout(() => {
-                        Array.from($(`#${key}`).children()[0].children).filter(e => e.children[3]).forEach((e) => e.children[3].children[0].style.left = '');
-                    }, 400);
-                }
             }
     
             this.setEvents();
@@ -159,6 +154,9 @@ class Shop {
                     left: '36px',
                     opacity: 1
                 }, 50);
+                setTimeout(() => {
+                    this.setRowAnimationLoad($('.main'));
+                }, 200);
             }
         }
         let length = section.length;
@@ -191,7 +189,7 @@ class Shop {
             top: `${direction === 'down' ? '-' : ''}100%`,
             opacity: 0.5
         }, 250);
-        Array.from($('.main').children()[0].children).filter(e => e.children[3]).forEach((e) => e.children[3].children[0].style.left = '0');
+        this.setRowAnimationCancel();
         next.css('position', 'absolute').animate({
             top: '0px',
             opacity: 1
@@ -205,33 +203,43 @@ class Shop {
                 left: '36px',
                 opacity: 1
             }, 50);
-            Array.from(next.children()[0].children).filter(e => e.children[3]).forEach((e) => e.children[3].children[0].style.left = '');
+            this.setRowAnimationLoad(next);
         }, 250);
         element.classList.remove('main');
         if(e) e.preventDefault();
     }
 
+    setRowAnimationLoad(row) {
+        Array.from(row.children()[0].children).filter(e => e.children[3]).forEach((e) => e.children[3].children[0].style.left = '');
+        return Array.from(row.children()[0].children).filter(e => e.className === 'other').forEach((e) => Array.from(e.children).filter(e => e.children[3])[0] ? Array.from(e.children).filter(e => e.children[3])[0].children[3].children[0].style.left = '' : null);
+    }
+
+    setRowAnimationCancel(row=$('.main')) {
+        Array.from(row.children()[0].children).filter(e => e.children[3]).forEach((e) => e.children[3].children[0].style.left = '0');
+        return Array.from(row.children()[0].children).filter(e => e.className === 'other').forEach((e) => Array.from(e.children).filter(e => e.children[3])[0] ? Array.from(e.children).filter(e => e.children[3])[0].children[3].children[0].style.left = '0' : null);
+    }
+
     setEvents() {
         let switching = false;
-        const move = this.switch;
+        const cls = this;
         document.onkeydown = function(e) {
             if(switching) return;
             const { key } = e;
             switch(key) {
                 case 'ArrowUp': {
-                    move(e, 'up', switching);
+                    cls.switch(e, 'up', switching);
                 } break;
         
                 case 'ArrowDown': {
-                    move(e, 'down', switching);
+                    cls.switch(e, 'down', switching);
                 } break;
 
                 case 'PageUp': {
-                    move(e, 'up', switching);
+                    cls.switch(e, 'up', switching);
                 } break;
 
                 case 'PageDown': {
-                    move(e, 'down', switching);
+                    cls.switch(e, 'down', switching);
                 } break;
             }
         };
@@ -243,7 +251,7 @@ class Shop {
             const direction = e.deltaY < 0 ? 'up' : e.deltaY > 0 ? 'down' : null;
 
             if(allow && direction) {
-                move(e, direction, switching);
+                cls.switch(e, direction, switching);
                 allow = false;
                 setTimeout(() => {
                     allow = true;
