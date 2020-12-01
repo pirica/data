@@ -156,6 +156,7 @@
     left: -134px;
     top: -2px;
     z-index: 1;
+    transition: 0.1s;
     white-space: nowrap;
 }
 

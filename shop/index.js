@@ -1,10 +1,35 @@
 let shop = null;
 
+class Tags {
+    constructor(granted) {
+        this.set(granted);
+        this.enabled = this.Cosmetics ? this.Cosmetics.UserFacingFlags ? this.Cosmetics.UserFacingFlags.HasVariants || this.Cosmetics.UserFacingFlags.Reactive ? true : false : false : false;
+    }
+
+    set(granted) {
+        let length = granted.length;
+
+        while(length--) {
+            const tags = granted[length].gameplayTags;
+            let amount = tags.length;
+
+            while(amount--) {
+                const tag = tags[amount];
+                tag.split('.').reduce((r, a) => r[a] = r[a] || {}, this);
+            }
+        }
+
+        return this;
+    }
+}
+
 class Banner {
     constructor(banner) {
         const hidden = ['reactive', 'variants', 'styles', 'traversal'];
         this.id = banner.id;
         this.name = banner.name;
+        this.intensity = banner.intensity;
+        this.data = banner.data;
         this.valid = hidden.find(b => this.name.toLowerCase().includes(b)) || ['collect the set'].find(e => this.name.toLowerCase().includes(e.toLowerCase())) ? false : true;
         this.special = this.valid && !['collect the set'].find(e => this.name.toLowerCase().includes(e.toLowerCase())) ? false : true;
     }
@@ -65,16 +90,10 @@ class Sections {
         size = size === "Normal" ? null : size === 'DoubleWide' ? '500px' : null;
         const render = item.assets && item.assets[0].renderData.Spotlight_Position_Y;
 
-        let banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
-        const special = !banner && item.banner ? true : item.assets ? item.assets.length > 1 : false;
-        const off = regularPrice - price;
-        if(off !== 0) {
-            banner = {
-                name: `${Intl.NumberFormat().format(off)} V-BUCKS OFF`,
-                color: 'purple'
-            };
-        }
-        const inner = `<img src="${asset}" draggable="false"><div>${special ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div${banner.color ? ' style="border: 3px solid #FF276D;background: #E4116E;color: white;"' : ''}>${banner.name}</div></div>` : ''}`;
+        const banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
+        const tags = new Tags(item.granted);
+
+        const inner = `<img src="${asset}" draggable="false"><div>${tags.enabled ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div style="left: 0;border: 3px solid ${banner.data.border};background: ${banner.data.background};color: ${banner.data.color};">${banner.name}</div></div>` : ''}`;
 
         if(element) {
             const div = document.createElement('div');
@@ -107,7 +126,12 @@ class Shop {
     
             while(length--) {
                 const key = keys[length];
-                this.setPanel(key, null, length === keys.length - 1 ? true : false);
+                this.setPanel(key, length === keys.length - 1 ? true : false);
+                if(length === keys.length - 1 ? true : false) {
+                    setTimeout(() => {
+                        Array.from($(`#${key}`).children()[0].children).filter(e => e.children[3]).forEach((e) => e.children[3].children[0].style.left = '');
+                    }, 400);
+                }
             }
     
             this.setEvents();
@@ -118,12 +142,12 @@ class Shop {
         }, 1500);
     }
 
-    setPanel(type, panel, selected=false) {
-        const section = panel ? this.sections[type].filter(e => e.categories[0] === panel) : this.sections[type];
+    setPanel(type, selected=false) {
+        const section = this.sections[type];
         let Panel = null;
-        if(!$(`#${panel}-${type}`)[0]) {
+        if(!$(`#${type}`)[0]) {
             Panel = document.createElement('div');
-            Panel.id = `${panel}-${type}`;
+            Panel.id = type;
 
             document.getElementsByClassName('rows')[0].appendChild(Panel);
             Panel.innerHTML = `<div></div><div><div id="main-message">loading<div></div></div></div>`;
@@ -135,14 +159,6 @@ class Shop {
                     left: '36px',
                     opacity: 1
                 }, 50);
-                const timer = setInterval(() => {
-                    if($('.main')[0].id !== `${panel}-${type}`) {
-                        clearInterval(timer);
-                        return;
-                    }
-
-                    $('.main').children()[1].children[0].children[0].innerHTML = this.rotation;
-                }, 1000);
             }
         }
         let length = section.length;
@@ -175,6 +191,7 @@ class Shop {
             top: `${direction === 'down' ? '-' : ''}100%`,
             opacity: 0.5
         }, 250);
+        Array.from($('.main').children()[0].children).filter(e => e.children[3]).forEach((e) => e.children[3].children[0].style.left = '0');
         next.css('position', 'absolute').animate({
             top: '0px',
             opacity: 1
@@ -188,6 +205,7 @@ class Shop {
                 left: '36px',
                 opacity: 1
             }, 50);
+            Array.from(next.children()[0].children).filter(e => e.children[3]).forEach((e) => e.children[3].children[0].style.left = '');
         }, 250);
         element.classList.remove('main');
         if(e) e.preventDefault();
@@ -236,27 +254,6 @@ class Shop {
     
     setShop() {
         this.addAllPanels();
-    }
-
-    setSpecialFeatured(panel=null) {
-        return this.setShop('specialFeatured', panel ? `Panel ${panel}` : null);
-    }
-
-    setFeatured() {
-        return this.setShop('featured');
-    }
-
-    setDaily() {
-        return this.setShop('daily');
-    }
-
-    get rotation() {
-        const minutesRaw = String(59 - new Date().getMinutes());
-        const hours = 23 - new Date().getUTCHours();
-        const seconds = 60 - new Date().getSeconds() === 60 ? 0 : 60 - new Date().getSeconds();
-        const minutes = minutesRaw.length === 1 ? `0${minutesRaw}` : minutesRaw;
-
-        return `${hours !== 0 ? `${hours}:` : ''}${minutes}:${String(seconds).length === 1 ? `0${seconds}` : seconds}`;
     }
 }
 
