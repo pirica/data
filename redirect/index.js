@@ -11,7 +11,7 @@ const exist = async (path) => {
     return status === 0;
 };
 
-const blacklist = ['/shop/'];
+const blacklist = ['/shop/', '/event/'];
 
 $(document).ready(async () => {
     const four = async () => {
