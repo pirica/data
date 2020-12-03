@@ -140,14 +140,10 @@ class Shop {
     constructor(data) {
         this.main = $('.main');
         this.sections = new Sections(data);
-        // this.aOhk = 
     }
 
     addAllPanels() {
-        $('.rows').animate({
-            opacity: 0
-        }, 1500);
-        setTimeout(() => {
+        const add = () => {
             $('.rows').empty();
             const keys = Object.keys(this.sections.raw);
             let length = keys.length;
@@ -162,7 +158,16 @@ class Shop {
             $('.rows').animate({
                 opacity: 1
             }, 500);
-        }, 1500);
+        };
+        if(new URLSearchParams(window.location.search.split('?')[1]).get('transition') === 'true') {
+            $('.rows').animate({
+                opacity: 0
+            }, 1500);
+            setTimeout(() => {
+                add();
+            }, 1500);
+        }
+        else add();
     }
 
     setPanel(type, selected=false) {
