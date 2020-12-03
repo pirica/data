@@ -69,7 +69,6 @@ class Sections {
             while (lengther--) {
                 const item = section[lengther];
                 const infront = section[lengther - 1];
-                console.log(item.size.type === 'Small')
 
                 this.createItem(item, item.size.type === 'Small' && infront && infront.size.type === 'Small' ? infront : null);
             }
@@ -81,12 +80,16 @@ class Sections {
     }
 
     createItem(item, infront) {
-        const event = (item) => () => {
-            console.log(item);
-        };
-        
         const div = document.createElement('div');
-        
+
+        const event = (item, element) => () => {
+            item.owned = item.owned ? false : true;
+            const last = element.children[1].children[element.children[1].children.length - 1];
+
+            last.style.cssText = item.owned ? 'background: #385B43; color: #90BA7A;' : '';
+            last.innerHTML = item.owned ? '<div>OWNED</div>' : `<img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}`;
+        };
+                
         const { size: { width, type: tileSize }, price: { finalPrice: price, regularPrice }, name, type, rarity, assets } = item;
         const banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
         const render = assets && assets[0].renderData.Spotlight_Position_Y;
@@ -116,8 +119,8 @@ class Sections {
             div.classList.add('other');
             const itemElement = this.createItem(item);
             const InfrontElement = this.createItem(infront).cloneNode(true);
-            InfrontElement.onclick = event(infront);
-            itemElement.onclick = event(item);
+            InfrontElement.onclick = event(infront, InfrontElement);
+            itemElement.onclick = event(item, itemElement);
             div.appendChild(itemElement);
             div.appendChild(InfrontElement);
         }
@@ -130,7 +133,7 @@ class Sections {
         }
 
         item.element = div;
-        if(!infront) div.onclick = event(item);
+        if(!infront) div.onclick = event(item, div);
 
         return div;
     }
@@ -140,6 +143,10 @@ class Shop {
     constructor(data) {
         this.main = $('.main');
         this.sections = new Sections(data);
+    }
+
+    log(message) {
+        console.log('%c[Shop]', 'color: #7289DA', message);
     }
 
     addAllPanels() {
@@ -213,7 +220,7 @@ class Shop {
         if(!next[0]) return;
         switching = true;
 
-        console.log('%c[Shop]', 'color: #7289DA', `Switching to next section, at direction ${direction} (${next[0].id})`);
+        this.log(`Switching to next section, at direction ${direction} (${next[0].id})`);
         $('.main').css('position', 'absolute').animate({
             top: `${direction === 'down' ? '-' : ''}100%`,
             opacity: 0.5
