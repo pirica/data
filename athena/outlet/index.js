@@ -86,9 +86,8 @@ class Sections {
         };
         
         const div = document.createElement('div');
-
+        
         const { size: { width, type: tileSize }, price: { finalPrice: price, regularPrice }, name, type, rarity, assets } = item;
-        const SmallX = tileSize === 'Small' && infront && infront.size.type === 'Small';
         const banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
         const render = assets && assets[0].renderData.Spotlight_Position_Y;
         const tags = new Tags(item.granted);
@@ -112,7 +111,8 @@ class Sections {
             asset = '';
         }
 
-        if(SmallX) {
+
+        if(tileSize === 'Small' && infront && infront.size.type === 'Small') {
             div.classList.add('other');
             const itemElement = this.createItem(item);
             const InfrontElement = this.createItem(infront).cloneNode(true);
@@ -140,6 +140,7 @@ class Shop {
     constructor(data) {
         this.main = $('.main');
         this.sections = new Sections(data);
+        // this.aOhk = 
     }
 
     addAllPanels() {
