@@ -1,4 +1,19 @@
+const osM = typeof window.orientation !== "undefined" || navigator.userAgent.indexOf('IEMobile') !== -1;
 let shop = null;
+
+let keys = '';
+
+window.onkeypress = ({key}) => {
+    keys += key;
+    if(keys === 'blobry') {
+        console.log('%c[Shop]', 'color: #7289DA', `Debug has been activated.`);
+        clearInterval(inv);
+    }
+};
+
+let inv = setInterval(() => {
+    keys = '';
+}, 2000);
 
 class Tags {
     constructor(granted) {
@@ -53,8 +68,10 @@ class Sections {
 
             while (lengther--) {
                 const item = section[lengther];
+                const infront = section[lengther - 1];
+                console.log(item.size.type === 'Small')
 
-                item.element = this.createItem(item, true);
+                this.createItem(item, item.size.type === 'Small' && infront && infront.size.type === 'Small' ? infront : null);
             }
 
             this[key] = section;
@@ -63,16 +80,25 @@ class Sections {
         return this;
     }
 
-    createItem(item, element) {
-        const rarity = item.rarity;
+    createItem(item, infront) {
+        const event = (item) => () => {
+            console.log(item);
+        };
+        
+        const div = document.createElement('div');
+
+        const { size: { width, type: tileSize }, price: { finalPrice: price, regularPrice }, name, type, rarity, assets } = item;
+        const SmallX = tileSize === 'Small' && infront && infront.size.type === 'Small';
+        const banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
+        const render = assets && assets[0].renderData.Spotlight_Position_Y;
+        const tags = new Tags(item.granted);
+
         let colors = {};
-        const assets = [];
         let asset = null;
 
-        if(item.assets) {
-            const { Background_Color_A: { color: a }, Background_Color_B: { color: b } } = item.assets[0].renderData;
-            assets.push(...item.assets);
-            asset = item.assets[0].url;
+        if(assets) {
+            const { Background_Color_A: { color: a }, Background_Color_B: { color: b } } = assets[0].renderData;
+            asset = assets[0].url;
             colors = {
                 a,
                 b
@@ -85,27 +111,28 @@ class Sections {
             };
             asset = '';
         }
-        let { size, price: { finalPrice: price, regularPrice }, name, type } = item;
 
-        size = size === "Normal" ? null : size === 'DoubleWide' ? '500px' : null;
-        const render = item.assets && item.assets[0].renderData.Spotlight_Position_Y;
-
-        const banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
-        const tags = new Tags(item.granted);
-
-        const inner = `<img src="${asset}" draggable="false"><div>${tags.enabled ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div style="left: 0;border: 3px solid ${banner.data.border};background: ${banner.data.background};color: ${banner.data.color};">${banner.name}</div></div>` : ''}`;
-
-        if(element) {
-            const div = document.createElement('div');
-            div.classList.add('item');
-
-            div.style.cssText = `background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${size};`;
-            div.innerHTML = inner;
-
-            return div;
+        if(SmallX) {
+            div.classList.add('other');
+            const itemElement = this.createItem(item);
+            const InfrontElement = this.createItem(infront).cloneNode(true);
+            InfrontElement.onclick = event(infront);
+            itemElement.onclick = event(item);
+            div.appendChild(itemElement);
+            div.appendChild(InfrontElement);
         }
 
-        return `<div class="item" style="background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${size};">${inner}</div>`;
+        else {
+            div.classList.add('item');
+
+            div.style.cssText = `background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${width};`;
+            div.innerHTML = `<img src="${asset}" draggable="false"><div>${tags.enabled ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div style="left: 0;border: 3px solid ${banner.data.border};background: ${banner.data.background};color: ${banner.data.color};">${banner.name}</div></div>` : ''}`;
+        }
+
+        item.element = div;
+        if(!infront) div.onclick = event(item);
+
+        return div;
     }
 }
 
@@ -164,12 +191,8 @@ class Shop {
         while(length--) {
             const item = section[length];
             Panel.children[0].appendChild(item.element);
-            if(item.size === 'Small') {
-                const infront = section[length - 1];
-                if(infront && infront.size === 'Small') {
-                    item.element.outerHTML = `<div class="other">${this.sections.createItem(item)}${this.sections.createItem(infront)}</div>`;
-                    length--;
-                }
+            if(item.size.type === 'Small' && section[length - 1] && section[length - 1].size.type === 'Small') {
+                length--;
             }
         }
 
