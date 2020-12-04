@@ -315,6 +315,10 @@ window.addEventListener('scroll', function(e){
     scroll_position = (document.body.getBoundingClientRect()).top;
     alert(scroll_direction);
 });
+
+$(document).on('scrollstart', () => {
+    alert('sdsfd')
+})
     }
     
     setShop() {
