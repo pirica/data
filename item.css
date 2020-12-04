@@ -193,3 +193,27 @@
     font-family: BurBank;
     src: url(./src/font/index.ttf);
 }
+
+.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) > div:before {
+    content: 'OWNED';
+    color: #57C081;
+    position: relative;
+    left: 21px;
+}
+
+.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) > div {
+    color: #0C4D3E;
+}
+
+.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) > img {
+    display: none;
+}
+
+.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) {
+    background: #0C4D3E;
+    color: #58C282;
+}
+
+.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) {
+    opacity: 0;
+}

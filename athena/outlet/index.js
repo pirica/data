@@ -86,8 +86,7 @@ class Sections {
             item.owned = item.owned ? false : true;
             const last = element.children[1].children[element.children[1].children.length - 1];
 
-            last.style.cssText = item.owned ? 'background: #385B43; color: #90BA7A;' : '';
-            last.innerHTML = item.owned ? '<div>OWNED</div>' : `<img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}`;
+            item.owned ? last.setAttribute('data-owned', 'true') : last.removeAttribute('data-owned');
         };
                 
         const { size: { width, type: tileSize }, price: { finalPrice: price, regularPrice }, name, type, rarity, assets } = item;
@@ -99,12 +98,21 @@ class Sections {
         let asset = null;
 
         if(assets) {
-            const { Background_Color_A: { color: a }, Background_Color_B: { color: b } } = assets[0].renderData;
-            asset = assets[0].url;
-            colors = {
-                a,
-                b
-            };
+            if(assets[0].renderData.Background_Color_A) {
+                const { Background_Color_A: { color: a }, Background_Color_B: { color: b } } = assets[0].renderData;
+                asset = assets[0].url;
+                colors = {
+                    a,
+                    b
+                };
+            }
+            else {
+                if(rarity) colors = {
+                    a: rarity.colorA,
+                    b: rarity.colorB
+                };
+                asset = '';
+            }
         }
         else {
             if(rarity) colors = {
@@ -113,7 +121,6 @@ class Sections {
             };
             asset = '';
         }
-
 
         if(tileSize === 'Small' && infront && infront.size.type === 'Small') {
             div.classList.add('other');
@@ -153,11 +160,12 @@ class Shop {
         const add = () => {
             $('.rows').empty();
             const keys = Object.keys(this.sections.raw);
+            const section = localStorage.getItem('section');
             let length = keys.length;
     
             while(length--) {
                 const key = keys[length];
-                this.setPanel(key, length === keys.length - 1 ? true : false);
+                this.setPanel(key, section === key && !$('.main')[0] || length === keys.length - 1 && !$('.main')[0]);
             }
     
             this.setEvents();
@@ -213,7 +221,7 @@ class Shop {
         $('.rows').children().css('position', 'absolute').css('top', '100%');
     }
 
-    switch(e, direction, switching) {
+    switch(direction, switching) {
         const next = direction === 'up' ? $('.main').prev() : $('.main').next();
         const element = document.getElementsByClassName('main')[0];
         if(document.getElementsByClassName('main')[1]) document.getElementsByClassName('main')[1].remove();
@@ -224,12 +232,12 @@ class Shop {
         $('.main').css('position', 'absolute').animate({
             top: `${direction === 'down' ? '-' : ''}100%`,
             opacity: 0.5
-        }, 250);
+        }, 150);
         this.setRowAnimationCancel();
         next.css('position', 'absolute').animate({
             top: '0px',
             opacity: 1
-        }, 250);
+        }, 150);
         next.children().eq(1).css('left', '').css('opacity', '0');
         setTimeout(() => {
             next[0].style.cssText = '';
@@ -240,9 +248,10 @@ class Shop {
                 opacity: 1
             }, 50);
             this.setRowAnimationLoad(next);
-        }, 250);
+        }, 150);
         element.classList.remove('main');
-        if(e) e.preventDefault();
+
+        localStorage.setItem('section', next[0].id);
     }
 
     setRowAnimationLoad(row) {
@@ -263,19 +272,19 @@ class Shop {
             const { key } = e;
             switch(key) {
                 case 'ArrowUp': {
-                    cls.switch(e, 'up', switching);
+                    cls.switch('up', switching);
                 } break;
         
                 case 'ArrowDown': {
-                    cls.switch(e, 'down', switching);
+                    cls.switch('down', switching);
                 } break;
 
                 case 'PageUp': {
-                    cls.switch(e, 'up', switching);
+                    cls.switch('up', switching);
                 } break;
 
                 case 'PageDown': {
-                    cls.switch(e, 'down', switching);
+                    cls.switch('down', switching);
                 } break;
             }
         };
@@ -287,13 +296,25 @@ class Shop {
             const direction = e.deltaY < 0 ? 'up' : e.deltaY > 0 ? 'down' : null;
 
             if(allow && direction) {
-                cls.switch(e, direction, switching);
+                cls.switch(direction, switching);
                 allow = false;
                 setTimeout(() => {
                     allow = true;
                 }, delay);
             }
         }
+        // window.onscroll = (e) => {
+        //     console.log('s')
+        // };
+
+        let scroll_position = 0;
+let scroll_direction;
+
+window.addEventListener('scroll', function(e){
+    scroll_direction = (document.body.getBoundingClientRect()).top > scroll_position ? 'up' : 'down';
+    scroll_position = (document.body.getBoundingClientRect()).top;
+    alert(scroll_direction);
+});
     }
     
     setShop() {
