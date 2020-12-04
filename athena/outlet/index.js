@@ -313,6 +313,7 @@ let scroll_direction;
 window.addEventListener('scroll', function(e){
     scroll_direction = (document.body.getBoundingClientRect()).top > scroll_position ? 'up' : 'down';
     scroll_position = (document.body.getBoundingClientRect()).top;
+    cls.switch(scroll_direction, switching);
     alert(scroll_direction);
 });
 
