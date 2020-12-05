@@ -80,19 +80,38 @@ class Sections {
     }
 
     createItem(item, infront) {
+        if(!localStorage.store) localStorage.store = JSON.stringify({
+            has: [],
+            section: {
+                name: null,
+                id: null
+            }
+        });
+
+        let storage = JSON.parse(localStorage.store);
         const div = document.createElement('div');
 
-        const event = (item, element) => () => {
-            item.owned = item.owned ? false : true;
-            const last = element.children[1].children[element.children[1].children.length - 1];
+        const event = (item) => () => {
+            storage = JSON.parse(localStorage.store);
 
-            item.owned ? last.setAttribute('data-owned', 'true') : last.removeAttribute('data-owned');
+            const id = `${item.type.replace(/ /g, '-')}-${item.name.replace(/ /g, '-')}`;
+            item.has = item.has ? false : true;
+
+            localStorage.store = JSON.stringify({
+                ...storage,
+                has: item.has ? storage.has.push(id) ? storage.has : [] : storage.has.filter(e => e !== id)
+            });
+
+            storage = JSON.parse(localStorage.store);
+
+            $(`#${item.type.replace(/ /g, '-')}-${item.name.replace(/ /g, '-')}`).attr('type', item.has ? 'has' : '');
         };
-                
+
         const { size: { width, type: tileSize }, price: { finalPrice: price, regularPrice }, name, type, rarity, assets } = item;
         const banner = item.banner ? new Banner(item.banner).valid ? new Banner(item.banner) : null : null;
         const render = assets && assets[0].renderData.Spotlight_Position_Y;
         const tags = new Tags(item.granted);
+        const background = item.rarity ? item.rarity.image1024 ? `url(${item.rarity.image1024});background-size: 100% 100%;background-repeat: no-repeat;` : false : false || assets && assets[0].renderData.Spotlight_Position_Y;
 
         let colors = {};
         let asset = null;
@@ -126,21 +145,27 @@ class Sections {
             div.classList.add('other');
             const itemElement = this.createItem(item);
             const InfrontElement = this.createItem(infront).cloneNode(true);
-            InfrontElement.onclick = event(infront, InfrontElement);
-            itemElement.onclick = event(item, itemElement);
+            InfrontElement.onclick = event(infront);
+            itemElement.onclick = event(item);
             div.appendChild(itemElement);
             div.appendChild(InfrontElement);
-        }
-
-        else {
+        } else {
             div.classList.add('item');
 
-            div.style.cssText = `background: ${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${width};`;
-            div.innerHTML = `<img src="${asset}" draggable="false"><div>${tags.enabled ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div>${Intl.NumberFormat().format(price)}</div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div style="left: 0;border: 3px solid ${banner.data.border};background: ${banner.data.background};color: ${banner.data.color};">${banner.name}</div></div>` : ''}`;
+            if(storage.has.includes(`${item.type.replace(/ /g, '-')}-${item.name.replace(/ /g, '-')}`)) {
+                div.setAttribute('type', 'has');
+                item.has = true;
+            }
+
+            div.style.cssText = `background: ${typeof background === 'string' ? background : `${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${width};`}`;
+            div.innerHTML = `<img src="${asset}" draggable="false"><div>${tags.enabled ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div><div>${Intl.NumberFormat().format(price)}</div></div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div style="left: 0;border: 3px solid ${banner.data.border};background: ${banner.data.background};color: ${banner.data.color};">${banner.name}</div></div>` : ''}`;
         }
 
         item.element = div;
-        if(!infront) div.onclick = event(item, div);
+        if(!infront) {
+            div.onclick = event(item);
+            div.id = `${item.type.replace(/ /g, '-')}-${item.name.replace(/ /g, '-')}`;
+        }
 
         return div;
     }
@@ -160,14 +185,20 @@ class Shop {
         const add = () => {
             $('.rows').empty();
             const keys = Object.keys(this.sections.raw);
-            const section = localStorage.getItem('section');
             let length = keys.length;
     
             while(length--) {
                 const key = keys[length];
-                this.setPanel(key, section === key && !$('.main')[0] || length === keys.length - 1 && !$('.main')[0]);
+                
+                const selected = key == JSON.parse(localStorage.store).section.id;
+                const main = document.getElementsByClassName('main')[0];
+
+                this.setPanel(key, selected || keys.length - 1 === length && !main);
             }
-    
+
+            $('.main').nextAll().css('top', '100%');
+            $('.main').prevAll().css('top', '-100%');
+
             this.setEvents();
 
             $('.rows').animate({
@@ -193,10 +224,12 @@ class Shop {
             Panel.id = type;
 
             document.getElementsByClassName('rows')[0].appendChild(Panel);
-            Panel.innerHTML = `<div></div><div><div id="main-message">loading<div></div></div></div>`;
+            Panel.innerHTML = `<div></div><div><div id="main-message">loading<div></div></div><div id="updates">Updates</div></div>`;
 
             if(selected) {
-                if($('.main')[0]) $('.main').remove();
+                if($('.main')[0]) {
+                    $('.main').attr('class', '');
+                }
                 Panel.classList.add('main');
                 $('.main').children().eq(1).animate({
                     left: '36px',
@@ -251,7 +284,13 @@ class Shop {
         }, 150);
         element.classList.remove('main');
 
-        localStorage.setItem('section', next[0].id);
+        localStorage.store = JSON.stringify({
+            ...JSON.parse(localStorage.store),
+            section: {
+                id: next[0].id,
+                name: this.sections[next[0].id][0].section.name
+            }
+        });
     }
 
     setRowAnimationLoad(row) {
@@ -303,23 +342,20 @@ class Shop {
                 }, delay);
             }
         }
-        // window.onscroll = (e) => {
-        //     console.log('s')
-        // };
 
-        let scroll_position = 0;
-let scroll_direction;
+        let open = false;
 
-window.addEventListener('scroll', function(e){
-    scroll_direction = (document.body.getBoundingClientRect()).top > scroll_position ? 'up' : 'down';
-    scroll_position = (document.body.getBoundingClientRect()).top;
-    cls.switch(scroll_direction, switching);
-    alert(scroll_direction);
-});
-
-$(document).on('scrollstart', () => {
-    alert('sdsfd')
-})
+        document.querySelectorAll('#updates').forEach(e => e.onclick = () => {
+            open = open ? false : true;
+            $('.updates')[open ? 'fadeOut' : 'fadeIn']();
+            if(!open) {
+                $('.updates').css('transform', 'skew(0deg)');
+            }
+            if(open) {
+                $('.updates').fadeOut();
+                $('.updates').css('transform', '');
+            }
+        });
     }
     
     setShop() {
@@ -328,6 +364,10 @@ $(document).on('scrollstart', () => {
 }
 
 $(document).ready(async () => {
+    $('.updates').children().eq(2).click(() => {
+        $('.updates').fadeOut();
+        $('.updates').css('transform', '');
+    });
     shop = new Shop(await (await fetch(`https://api.blobry.com/data`)).json());
     shop.setShop();
 

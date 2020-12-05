@@ -9,18 +9,9 @@
     justify-content: center;
     flex-flow: wrap;
     flex-shrink: 0;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
     font-family: 'BurBank';
-}
-
-.item>img:nth-of-type(1) {
-    height: inherit;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    position: relative;
-    top: -8px;
-    transition: .7s;
-    z-index: 1;
 }
 
 .item:hover > div:nth-of-type(1) > div:nth-of-type(1) {
@@ -85,6 +76,27 @@
     overflow: hidden;
 }
 
+.item[type="has"] > div:nth-of-type(1) > div:nth-of-type(3) {
+    background: #0C4D3E;
+    color: #58C282;
+}
+
+.item[type="has"] > div:nth-of-type(1) > div:nth-of-type(3) > div {
+    color: #0C4D3E;
+}
+
+.item[type="has"] > div:nth-of-type(1) > div:nth-of-type(3) > div:before {
+    content: 'OWNED';
+    color: #57C081;
+    position: relative;
+    float: left;
+    right: 5px;
+}
+
+.item[type="has"] > div:nth-of-type(1) > div:nth-of-type(3) > div > div {
+    display: none;
+}
+
 .item > div:nth-of-type(1) > div:nth-of-type(3) > img {
     margin: 0;
     position: relative;
@@ -93,6 +105,10 @@
     width: 23px;
     opacity: 0.6;
     transform: rotate(20deg);
+}
+
+.item[type="has"] > div:nth-of-type(1) > div:nth-of-type(3) > img {
+    display: none;
 }
 
 .item > div:nth-of-type(1) > div:nth-of-type(3) > div {
@@ -113,6 +129,17 @@
 .item:hover > div:nth-of-type(1) > div:nth-of-type(2) > div {
     font-size: 18px;
     top: -4px;
+}
+
+.item > img:nth-of-type(1) {
+    height: inherit;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: -8px;
+    transition: .7s;
+    z-index: 1;
 }
 
 .item:hover img:nth-of-type(1) {
@@ -182,6 +209,10 @@
     left: -10px;
 }
 
+.item[type="has"] > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) {
+    opacity: 0;
+}
+
 .rows > div > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) {
     margin: 10px;
     position: relative;
@@ -192,28 +223,4 @@
 @font-face {
     font-family: BurBank;
     src: url(./src/font/index.ttf);
-}
-
-.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) > div:before {
-    content: 'OWNED';
-    color: #57C081;
-    position: relative;
-    left: 21px;
-}
-
-.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) > div {
-    color: #0C4D3E;
-}
-
-.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) > img {
-    display: none;
-}
-
-.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) {
-    background: #0C4D3E;
-    color: #58C282;
-}
-
-.item[data-owned] > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) {
-    opacity: 0;
 }
