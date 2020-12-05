@@ -182,6 +182,36 @@ html {
     right: 26px;
 }
 
+.debug {
+    width: 90%;
+    height: 100px;
+    transform: translate(-50%);
+    left: 50%;
+    position: absolute;
+    background: white;
+    border-radius: 4px;
+    text-align: center;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.5s;
+    top: -50%;
+    font-size: 27px;
+    opacity: 0;
+}
+
+.debug > div {
+    background: #0F0D12;
+    width: 100%;
+    height: 17px;
+    position: absolute;
+    top: 90px;
+    z-index: 0;
+    transition: 0.2s;
+    transform: rotate(-0.7deg);
+}
+
 @keyframes loading {
     0% {
         background-position: -50vw 0;

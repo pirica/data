@@ -5,8 +5,10 @@ let keys = '';
 
 window.onkeypress = ({key}) => {
     keys += key;
-    if(keys === 'blobry') {
-        console.log('%c[Shop]', 'color: #7289DA', `Debug has been activated.`);
+    if(keys === 'debug') {
+        console.log('%c[Shop]', 'color: #7289DA', `${localStorage.debug === "true" ? 'Debug has been deactivated' : 'Debug has been activated'}.`);
+        localStorage.debug = localStorage.debug === "true" ? null : true;
+        location.reload();
         clearInterval(inv);
     }
 };
@@ -157,7 +159,7 @@ class Sections {
                 item.has = true;
             }
 
-            div.style.cssText = `background: ${typeof background === 'string' ? background : `${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);width:${width};`}`;
+            div.style.cssText = `background: ${typeof background === 'string' ? `${background};${width ? `width:${width};` : ''}` : `${render ? '' : 'radial'}-gradient(circle, ${colors.b}, 50%, ${colors.a} 138%);${width ? `width:${width};` : ''}`}`;
             div.innerHTML = `<img src="${asset}" draggable="false"><div>${tags.enabled ? '<img src="src/images/styles.png">' : ''}<div style="background: ${item.series ? colors.b : rarity ? rarity.colorA : null};"></div><div>${name}<div>${type}</div></div><div><img src="./vbucks.png"><div><div>${Intl.NumberFormat().format(price)}</div></div>${regularPrice !== price ? `<div>${Intl.NumberFormat().format(regularPrice)}</div>` : ''}</div></div>${render ? `<div style="background: radial-gradient(circle at ${item.assets[0].renderData.Spotlight_Position_X}% ${item.assets[0].renderData.Spotlight_Position_Y}%, ${item.assets[0].renderData.FallOff_Color.color} 0%, transparent 100%); filter: brightness(${item.assets[0].renderData.Gradient_Hardness});"></div>` : '<div></div>'}${banner ? `<div><div style="left: 0;border: 3px solid ${banner.data.border};background: ${banner.data.background};color: ${banner.data.color};">${banner.name}</div></div>` : ''}`;
         }
 
@@ -198,7 +200,7 @@ class Shop {
 
             $('.main').nextAll().css('top', '100%');
             $('.main').prevAll().css('top', '-100%');
-
+            
             this.setEvents();
 
             $('.rows').animate({
@@ -364,15 +366,32 @@ class Shop {
 }
 
 $(document).ready(async () => {
+    const url = `${localStorage.debug === "true" ? 'http://127.0.0.1:8787' : 'https://api.blobry.com/data'}/data`;
+    if(localStorage.debug === "true") {
+        const div = document.createElement('div');
+        document.body.appendChild(div);
+        div.outerHTML = `<div class="debug">Debug is enabled meaning requests will go to http://127.0.0.1:8787, to disable it type debug.<div></div></div>`;
+        $('.debug').animate({
+            top: '20px',
+            opacity: '1'
+        }, 500, () => {
+            setTimeout(() => {
+                $('.debug').animate({
+                    top: '',
+                    opacity: ''
+                }, 300);
+            }, 5000);
+        });
+    }
     $('.updates').children().eq(2).click(() => {
         $('.updates').fadeOut();
         $('.updates').css('transform', '');
     });
-    shop = new Shop(await (await fetch(`https://api.blobry.com/data`)).json());
+    shop = new Shop(await (await fetch(url)).json());
     shop.setShop();
 
     setInterval(async () => {
-        shop = new Shop(await (await fetch(`https://api.blobry.com/data`)).json());
+        shop = new Shop(await (await fetch(url)).json());
         shop.setShop();
     }, 900000);
 });
