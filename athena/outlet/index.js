@@ -366,7 +366,7 @@ class Shop {
 }
 
 $(document).ready(async () => {
-    const url = `${localStorage.debug === "true" ? 'http://127.0.0.1:8787' : 'https://api.blobry.com/data'}/data`;
+    const url = `${localStorage.debug === "true" ? 'http://127.0.0.1:8787' : 'https://api.blobry.com'}/data`;
     if(localStorage.debug === "true") {
         const div = document.createElement('div');
         document.body.appendChild(div);
