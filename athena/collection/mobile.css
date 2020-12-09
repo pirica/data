@@ -37,3 +37,7 @@ html {
     background: radial-gradient(#0042E5 28%, #002581 136%);
     width: 100%;
 }
+
+.character > img {
+    width: 100%;
+}
