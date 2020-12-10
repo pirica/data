@@ -23,6 +23,7 @@ html {
 .character > div:nth-of-type(1) {
     left: -61px;
     box-shadow: 99px 411px 99px 21px #002581, 493px 442px 1299px 21px #002581, 167px 645px 122px 21px #002581;
+    height: 100vh;
 }
 
 .character > div:nth-of-type(2) {
